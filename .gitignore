@@ -1,0 +1,4 @@
+# build files
+.DS_Store
+activemq-data
+target
