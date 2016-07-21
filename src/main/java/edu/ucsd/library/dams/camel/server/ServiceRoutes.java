@@ -1,5 +1,6 @@
 package edu.ucsd.library.dams.camel.server;
 
+import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
@@ -10,29 +11,30 @@ import org.apache.camel.builder.RouteBuilder;
  */
 public class ServiceRoutes extends RouteBuilder {
 
+    @PropertyInject("{{redelivery.delay}}")
+    private String redeliveryDelay;
+
+    @PropertyInject("{{redelivery.max}}")
+    private int redeliveryMax;
+
     @Override
     public void configure() throws Exception {
 
-        /**
-         * A generic error handler for this RouteBuilder
-         */
-        onException(Exception.class)
-            .handled(true)
-            .bean(ErrorResponse.class, "processFailed")
-            .to("mock:error");
-
         // generic error handler with redeliveries to try
-        errorHandler(deadLetterChannel("mock:error").maximumRedeliveries(1));
+        errorHandler(deadLetterChannel("jms:queue:DLQ.ERROR")
+                .maximumRedeliveries(redeliveryMax)
+                .delayPattern(redeliveryDelay));
 
         // route from the damsrepo queue for processing.
-        from("jms:queue:damsrepo").choice()
-        .when(header(Constants.COMMAND).endsWith(Constants.COMMAND_FFMPEG))
-            .to("ffmpeg")
-        .when(header(Constants.COMMAND).endsWith(Constants.COMMAND_IMAGEMAGICK))
-            .to("imageMagick")
-        .otherwise()
-            .to("mock:error");
+        from("jms:queue:damsrepo?requestTimeout={{request.timeout}}&concurrentConsumers={{pool.size}}")
+            .choice()
+                .when(header(Constants.COMMAND).endsWith(Constants.COMMAND_FFMPEG))
+                    .to("ffmpeg")
+                .when(header(Constants.COMMAND).endsWith(Constants.COMMAND_IMAGEMAGICK))
+                    .to("imageMagick")
+                .otherwise()
+                    .throwException(new Exception("Unknown command: " + header(Constants.COMMAND)))
+            .endChoice();
 
     }
-
 }

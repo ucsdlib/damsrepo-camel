@@ -51,7 +51,7 @@ public final class DamsCamelClient {
         Exchange exchange = endpoint.createExchange(ExchangePattern.InOut);
         // set the input message
         org.apache.camel.Message message = exchange.getIn();
-        message.setHeader(Constants.CAMEL_JMS_TIMEOUT, 360000);
+        message.setHeader(Constants.CAMEL_JMS_TIMEOUT, 3600000);
         message.setHeader(Constants.COMMAND, command);
         message.setHeader(Constants.SOURCE_FILE, sourceFile.getAbsolutePath());
         message.setHeader(Constants.DEST_FILE, destFile.getAbsolutePath());

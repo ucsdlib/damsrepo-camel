@@ -37,6 +37,9 @@
   <!-- spring property placeholder, ignore resource not found as the file resource is for unit testing -->
   <context:property-placeholder location="classpath:camel.properties,file:target/custom.properties"
                                 ignore-resource-not-found="true"/>
+  <bean id="properties" class="org.apache.camel.component.properties.PropertiesComponent">
+      <property name="location" value="classpath:camel.properties"/>
+  </bean>
 
   <!-- START SNIPPET: e3 -->
   <!-- declare a camel context that scans for classes that is RouteBuilder
@@ -48,6 +51,18 @@
     <camel:jmxAgent id="agent" createConnector="true"/>
   </camel:camelContext>
   <!-- END SNIPPET: e3 -->
+
+<!--configure the camel activemq component to use the external broker 
+  <bean id="jms" class="org.apache.activemq.camel.component.ActiveMQComponent">
+    <property name="connectionFactory">
+      <bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://${tcp.host:'localhost'}:${tcp.port}"/>
+        <property name="userName" value="${activemq.username}"/>
+        <property name="password" value="${activemq.password}"/>
+      </bean>
+    </property>
+  </bean>
+-->
 
   <!-- START SNIPPET: e4 -->
   <!-- lets configure the ActiveMQ JMS broker server -->
@@ -67,7 +82,8 @@
     <property name="connectionFactory">
       <bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
         <property name="brokerURL" value="vm://myBroker"/>
-        <property name="trustAllPackages" value="true"/>
+        <property name="userName" value="${activemq.username}"/>
+        <property name="password" value="${activemq.password}"/>
       </bean>
     </property>
   </bean>
