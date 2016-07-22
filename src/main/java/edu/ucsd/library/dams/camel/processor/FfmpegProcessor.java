@@ -46,13 +46,16 @@ public class FfmpegProcessor implements Processor {
 				message.setBody("Successfully created " + messageSufix);
 			}
 		}catch (Exception e) {
+			exchange.setException(e);
+			message.setHeader("result", false);
+			message.setBody("Failed to create " + messageSufix);
 			LOGGER.error("Failed to create " + messageSufix, e);
 			throw e;
 		}
 	}
 
 	/**
-	 * create thumbnail and vidoe/audio derivative for videos
+	 * create thumbnail and vidoe/audio derivative
 	 * @param command
 	 * @param srcFile - source file id
 	 * @param destFile - thumbnail files id

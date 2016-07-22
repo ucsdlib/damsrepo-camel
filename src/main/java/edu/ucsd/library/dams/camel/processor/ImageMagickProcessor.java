@@ -38,16 +38,18 @@ public class ImageMagickProcessor implements Processor {
 
 		LOGGER.info("{Command: " + command + ", sourceFile: \"" + srcFile + "\", destFile: \"" + destFile
 				+ "\", size: \"" + size + "\" frame: " + frameNo + "}");
-		String messaeSufix = "derivative " + destFile + " from " + srcFile + ".";
+		String messageSufix = "derivative " + destFile + " from " + srcFile + ".";
 		try{
 			if (!createDerivative( command, srcFile, destFile, size, frameNo )) {
-				throw new Exception("Failed to create " + messaeSufix);
+				throw new Exception("Failed to create " + messageSufix);
 			} else {
 				message.setHeader("result", true);
-				message.setBody("Successfully created " + messaeSufix);
+				message.setBody("Successfully created " + messageSufix);
 			}
 		}catch (Exception e) {
-			LOGGER.error("Failed to create " + messaeSufix, e);
+			message.setHeader("result", false);
+			message.setBody("Failed to create " + messageSufix);
+			LOGGER.error("Failed to create " + messageSufix, e);
 			throw e;
 		}
 	}
