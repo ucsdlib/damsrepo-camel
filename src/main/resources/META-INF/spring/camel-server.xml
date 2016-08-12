@@ -68,10 +68,11 @@
   <!-- lets configure the ActiveMQ JMS broker server -->
   <broker:broker useJmx="true" persistent="false" brokerName="myBroker">
     <broker:transportConnectors>
-      <!-- expose a VM transport for in-JVM transport between AMQ and Camel on the server side -->
+      <!-- expose a VM transport for in-JVM transport between AMQ and Camel on the server side
       <broker:transportConnector name="vm" uri="vm://myBroker"/>
+      -->
       <!-- expose a TCP transport for clients to use -->
-      <broker:transportConnector name="tcp" uri="tcp://localhost:${tcp.port}"/>
+      <broker:transportConnector name="tcp" uri="tcp://0.0.0.0:${tcp.port}"/>
     </broker:transportConnectors>
   </broker:broker>
   <!-- END SNIPPET: e4 -->
@@ -81,7 +82,7 @@
   <bean id="jms" class="org.apache.activemq.camel.component.ActiveMQComponent">
     <property name="connectionFactory">
       <bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="vm://myBroker"/>
+        <property name="brokerURL" value="tcp://${tcp.host:'localhost'}:${tcp.port}"/>
         <property name="userName" value="${activemq.username}"/>
         <property name="password" value="${activemq.password}"/>
       </bean>
